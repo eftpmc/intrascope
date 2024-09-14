@@ -1,6 +1,6 @@
 import { ComponentProps, useState } from "react";
 import { PlusIcon } from "@/icons";
-import { createDocument } from "@/lib/actions";
+import { createDocumentInSupabase } from "@/utils/supabase/supabaseData";
 import { Button } from "@/primitives/Button";
 import { Popover } from "@/primitives/Popover";
 import { Document, DocumentGroup, DocumentType, DocumentUser } from "@/types";
@@ -22,25 +22,27 @@ export function DocumentCreatePopover({
 }: Props) {
   const [disableButtons, setDisableButtons] = useState(false);
 
-  // Create a new document, then navigate to the document's URL location
+  // Create a new document using Supabase, then handle post-creation logic
   async function createNewDocument(name: string, type: DocumentType) {
     setDisableButtons(true);
-    const result = await createDocument(
-      {
-        name,
-        type,
-        userId,
-        draft,
-        groupIds: draft ? undefined : groupIds,
-      },
-      true
-    );
 
-    // If this runs, there's an error and the redirect failed
+    const result = await createDocumentInSupabase({
+      name,
+      type,
+      userId,
+      draft,
+      groupIds: draft ? undefined : groupIds,
+    });
+
+    // If this runs, there's an error and the creation failed
     if (!result || result?.error || !result.data) {
       setDisableButtons(false);
       return;
     }
+
+    // Success! You can redirect the user or handle the result here
+    console.log("Document created:", result.data);
+    setDisableButtons(false);
   }
 
   return (

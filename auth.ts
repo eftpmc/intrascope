@@ -1,50 +1,56 @@
-import NextAuth from "next-auth";
-import { authConfig } from "@/auth.config";
-import { getUser } from "@/lib/database/getUser";
-
-// Your NextAuth secret (generate a new one for production)
-// More info: https://next-auth.js.org/configuration/options#secret
-// `create-liveblocks-app` generates a value for you, but there's a
-// fallback value in case you don't use the installer.
-export const NEXTAUTH_SECRET =
-  process.env.NEXTAUTH_SECRET || "p49RDzU36fidumaF7imGnzyhRSPWoffNjDOleU77SM4=";
-
-export const {
-  handlers: { GET, POST },
-  auth,
-  signIn,
-  signOut,
-} = NextAuth({
-  secret: NEXTAUTH_SECRET,
-  callbacks: {
-    // Get extra user info from your database to pass to front-end
-    // For front end, update next-auth.d.ts with session type
-    async session({ session }: { session: any }) {
-      const userInfo = await getUser(session.user.email);
-
-      if (!userInfo) {
-        throw new Error("User not found");
-      }
-
-      session.user.info = userInfo;
-      return session;
+// utils/auth.ts
+import { createClient } from "@/utils/supabase/client";
+const supabase = createClient();
+// Function to handle Google OAuth sign-in
+export const signInWithGoogle = async () => {
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      queryParams: {
+        access_type: "offline",
+        prompt: "consent",
+      },
     },
-  },
-  pages: {
-    signIn: "/signin",
-  },
+  });
 
-  ...authConfig,
-});
-
-export function getProviders() {
-  const providers: Record<string, string> = {};
-
-  for (const provider of authConfig.providers) {
-    if ("id" in provider) {
-      providers[provider.id] = provider.name;
-    }
+  if (error) {
+    console.error("Error during Google sign-in:", error.message);
+    return null;
   }
 
-  return providers;
-}
+  if (data?.url) {
+    window.location.href = data.url;
+  }
+};
+
+// Function to check the current session
+export const checkSession = async () => {
+  const { data: session } = await supabase.auth.getSession();
+  return session;
+};
+
+// Function to get the current user profile information
+export const getUserProfile = async (userId: string) => {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select(`full_name, avatar_url`)
+    .eq('id', userId)
+    .single();
+
+  if (error) {
+    console.error("Error fetching user profile:", error.message);
+    return null;
+  }
+
+  return data;
+};
+
+// Function to handle sign out
+export const handleSignOut = async () => {
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    console.error("Error during sign out:", error.message);
+  } else {
+    window.location.href = "/"; // Redirect after signing out
+  }
+};

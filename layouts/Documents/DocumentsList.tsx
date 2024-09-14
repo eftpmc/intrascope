@@ -1,126 +1,82 @@
 "use client";
 
 import clsx from "clsx";
-import { useSession } from "next-auth/react";
-import { ComponentProps, useMemo, useState } from "react";
+import { useState, useEffect } from "react";
+import { createClient } from "@/utils/supabase/client"; // Import Supabase client
+import { ComponentProps } from "react";
 import {
   DocumentCreatePopover,
   DocumentRowSkeleton,
 } from "@/components/Documents";
 import { DocumentRowGroup } from "@/components/Documents/DocumentRowGroup";
 import { PlusIcon } from "@/icons";
-import { GetDocumentsProps } from "@/lib/actions";
-import { usePaginatedDocumentsSWR } from "@/lib/hooks";
 import { Button } from "@/primitives/Button";
 import { Container } from "@/primitives/Container";
 import { Select } from "@/primitives/Select";
 import { Spinner } from "@/primitives/Spinner";
-import { DocumentType, Group } from "@/types";
-import { capitalize } from "@/utils";
+import { DocumentType } from "@/types";
 import styles from "./DocumentsList.module.css";
+import { capitalize } from "@/utils/capitalize";
 
 // Load `x` documents at a time
 const DOCUMENT_LOAD_LIMIT = 10;
 
 interface Props extends ComponentProps<"div"> {
   filter?: "all" | "drafts" | "group";
-  group?: Group;
 }
 
 export function DocumentsList({
   filter = "all",
-  group,
   className,
   ...props
 }: Props) {
-  const { data: session } = useSession();
   const [documentType, setDocumentType] = useState<DocumentType | "all">("all");
+  const [documents, setDocuments] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const supabase = createClient();
 
-  // Return `getDocuments` params for the current filters/group
-  const getDocumentsOptions: GetDocumentsProps | null = useMemo(() => {
-    if (!session) {
-      return null;
-    }
+  // Fetch documents from the `data` table in Supabase, filtering by genre
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      setLoading(true);
+      setError(null);
 
-    const currentDocumentType =
-      documentType === "all" ? undefined : documentType;
+      // Supabase query to fetch documents by genre
+      let query = supabase.from("data").select("*");
 
-    // Get the current user's drafts
-    if (filter === "drafts") {
-      return {
-        documentType: currentDocumentType,
-        userId: session.user.info.id,
-        drafts: true,
-        limit: DOCUMENT_LOAD_LIMIT,
-      };
-    }
+      if (documentType !== "all") {
+        query = query.eq("type", documentType); // Filter by genre
+      }
 
-    // Get the current group's documents
-    if (filter === "group" && group?.id) {
-      return {
-        documentType: currentDocumentType,
-        groupIds: [group.id],
-        limit: DOCUMENT_LOAD_LIMIT,
-      };
-    }
+      const { data, error } = await query;
 
-    // Get all documents for the current user
-    return {
-      documentType: currentDocumentType,
-      userId: session.user.info.id,
-      groupIds: session.user.info.groupIds,
-      limit: DOCUMENT_LOAD_LIMIT,
+      if (error) {
+        setError("Error fetching documents");
+        console.error("Error fetching documents:", error);
+      } else {
+        setDocuments(data || []); // If data is null, set an empty array
+      }
+
+      setLoading(false);
     };
-  }, [filter, group, session, documentType]);
 
-  // When session is found, find pages of documents with the above document options
-  const {
-    data,
-    size,
-    setSize,
-    mutate: revalidateDocuments,
-    isLoadingInitialData,
-    isLoadingMore,
-    isEmpty,
-    isReachingEnd,
-    // error,
-    // isValidating,
-    // isRefreshing,
-  } = usePaginatedDocumentsSWR(getDocumentsOptions, {
-    refreshInterval: 10000,
-  });
-
-  const documentsPages = data ?? [];
-
-  if (!session) {
-    return (
-      <Container
-        size="small"
-        className={clsx(className, styles.documents)}
-        {...props}
-      >
-        <div className={styles.container}>
-          <div className={styles.emptyState}>
-            <p>You don’t have access to these documents.</p>
-          </div>
-        </div>
-      </Container>
-    );
-  }
+    fetchDocuments();
+  }, [documentType, filter, supabase]);
 
   const createDocumentButton = (
     <DocumentCreatePopover
       align="end"
-      userId={session.user.info.id}
-      groupIds={group?.id ? [group.id] : undefined}
       draft={filter === "drafts" || filter === "all"}
       sideOffset={12}
+      userId={""}
     >
-      <Button icon={<PlusIcon />}>
-        {group?.id ? "New document" : "New draft"}
-      </Button>
+      <Button icon={<PlusIcon />}>New Document</Button>
     </DocumentCreatePopover>
   );
+
+  // Define a header that updates based on the selected document type
+  const headerTitle = documentType === "all" ? capitalize(filter) : capitalize(documentType);
 
   return (
     <Container
@@ -129,22 +85,20 @@ export function DocumentsList({
       {...props}
     >
       <div className={styles.header}>
-        <h1 className={styles.headerTitle}>
-          {group?.name ?? capitalize(filter)}
-        </h1>
+        <h1 className={styles.headerTitle}>{headerTitle}</h1> {/* Update title */}
         <div className={styles.headerActions}>
           <Select
             initialValue="all"
             items={[
               { value: "all", title: "All" },
-              { value: "text", title: "Text" },
-              { value: "whiteboard", title: "Whiteboard" },
-              { value: "spreadsheet", title: "Spreadsheet", disabled: true },
+              { value: "entertainment", title: "Entertainment" },
+              { value: "fashion", title: "Fashion" },
+              { value: "tech", title: "Tech" },
+              { value: "food", title: "Food" },
+              { value: "health", title: "Health" },
+              { value: "other", title: "Other" },
             ]}
-            onChange={(value: "all" | DocumentType) => {
-              setDocumentType(value);
-              revalidateDocuments();
-            }}
+            onChange={(value: "all" | DocumentType) => setDocumentType(value)}
             className={styles.headerSelect}
           />
           {createDocumentButton}
@@ -152,40 +106,30 @@ export function DocumentsList({
       </div>
 
       <div className={styles.container}>
-        {!isLoadingInitialData ? (
-          !isEmpty ? (
-            <>
-              {documentsPages.map((documentPage) => (
-                <DocumentRowGroup
-                  key={documentPage.nextCursor}
-                  documents={documentPage.documents}
-                  revalidateDocuments={revalidateDocuments}
-                />
-              ))}
-              {!isReachingEnd ? (
-                <div className={styles.actions}>
-                  <Button
-                    disabled={isLoadingMore}
-                    onClick={() => setSize(size + 1)}
-                    icon={isLoadingMore ? <Spinner /> : null}
-                  >
-                    {isLoadingMore ? "Loading…" : "Show more"}
-                  </Button>
-                </div>
-              ) : null}
-            </>
-          ) : (
-            <div className={styles.emptyState}>
-              <p>No documents yet.</p>
-              {createDocumentButton}
-            </div>
-          )
-        ) : (
+        {loading ? (
           <>
             <DocumentRowSkeleton className={styles.row} />
             <DocumentRowSkeleton className={styles.row} />
             <DocumentRowSkeleton className={styles.row} />
           </>
+        ) : error ? (
+          <div className={styles.emptyState}>
+            <p>{error}</p>
+          </div>
+        ) : documents.length > 0 ? (
+          <>
+            <DocumentRowGroup
+              documents={documents}
+              revalidateDocuments={function (): void {
+                throw new Error("Function not implemented.");
+              }}
+            />
+          </>
+        ) : (
+          <div className={styles.emptyState}>
+            <p>No documents yet.</p>
+            {createDocumentButton}
+          </div>
         )}
       </div>
     </Container>

@@ -1,31 +1,30 @@
-import { RoomUser } from "@liveblocks/node";
 import clsx from "clsx";
-import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
+import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
-import {
-  ComponentProps,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { ComponentProps, useCallback, useMemo, useState, useEffect } from "react";
 import { DOCUMENT_URL } from "@/constants";
 import { DeleteIcon, MoreIcon } from "@/icons";
-import { useGroupsInfo } from "@/lib/hooks";
-import { getDocumentAccess } from "@/lib/utils";
 import { AvatarStack } from "@/primitives/AvatarStack";
 import { Button } from "@/primitives/Button";
 import { Popover } from "@/primitives/Popover";
 import { Skeleton } from "@/primitives/Skeleton";
-import { Document, DocumentAccess } from "@/types";
+import { deleteDocumentFromSupabase } from "@/utils/supabase/supabaseData"; // Import the Supabase delete operation
 import { DocumentDeleteDialog } from "./DocumentDeleteDialog";
 import { DocumentIcon } from "./DocumentIcon";
 import styles from "./DocumentRow.module.css";
 
+// Define the structure for documents fetched from Supabase
+interface Document {
+  id: string;
+  title: string;
+  type: string;
+  updated_at: string;
+  user_id: string;
+}
+
 interface Props extends ComponentProps<"div"> {
   document: Document;
-  others?: RoomUser[];
+  others?: any[];
   revalidateDocuments: () => void;
 }
 
@@ -36,34 +35,9 @@ export function DocumentRow({
   revalidateDocuments,
   ...props
 }: Props) {
-  const groupIds = useMemo(
-    () => Object.keys(document.accesses.groups),
-    [document]
-  );
-  const groups = useGroupsInfo(groupIds);
-
-  const { data: session } = useSession();
-  const [currentUserAccess, setCurrentUserAccess] = useState(
-    DocumentAccess.NONE
-  );
-
-  // Check if current user has access to edit the room
-  useEffect(() => {
-    if (!session) {
-      return;
-    }
-
-    const access = getDocumentAccess({
-      documentAccesses: document.accesses,
-      userId: session.user.info.id,
-      groupIds: session.user.info.groupIds,
-    });
-    setCurrentUserAccess(access);
-  }, [session, document]);
-
   const [isMoreOpen, setMoreOpen] = useState(false);
 
-  const date = new Date(document.lastConnection);
+  const date = new Date(document.updated_at); // Fetch updated_at from Supabase data
   const url = DOCUMENT_URL(document.type, document.id);
 
   const handleDeleteDialogOpenChange = useCallback((isOpen: boolean) => {
@@ -71,6 +45,18 @@ export function DocumentRow({
       setMoreOpen(false);
     }
   }, []);
+
+  const handleDeleteDocument = async () => {
+    const { error } = await deleteDocumentFromSupabase({
+      documentId: document.id,
+    });
+
+    if (!error) {
+      revalidateDocuments();
+    } else {
+      console.error("Failed to delete document:", error);
+    }
+  };
 
   return (
     <div className={clsx(className, styles.row)} {...props}>
@@ -80,16 +66,7 @@ export function DocumentRow({
         </div>
         <div className={styles.info}>
           <span className={styles.documentName}>
-            <span>{document.name}</span>
-            {groups.length > 0 ? (
-              <span className={styles.groups}>
-                {groups.map((group) => (
-                  <span key={group.id} className={styles.group}>
-                    {group.name}
-                  </span>
-                ))}
-              </span>
-            ) : null}
+            <span>{document.title}</span>
           </span>
           <span className={styles.documentDate}>
             Edited {formatDistanceToNow(date)} ago
@@ -99,9 +76,8 @@ export function DocumentRow({
           <div className={styles.presence}>
             <AvatarStack
               avatars={others.map((other) => ({
-                name: other.info.name,
-                src: other.info.avatar,
-                color: other.info.color,
+                name: other.name,
+                src: other.avatar_url,
               }))}
               size={20}
               tooltip
@@ -109,38 +85,36 @@ export function DocumentRow({
           </div>
         )}
       </Link>
-      {currentUserAccess === DocumentAccess.FULL ? (
-        <div className={styles.more}>
-          <Popover
-            align="end"
-            content={
-              <div className={styles.morePopover}>
-                <DocumentDeleteDialog
-                  documentId={document.id}
-                  onDeleteDocument={revalidateDocuments}
-                  onOpenChange={handleDeleteDialogOpenChange}
-                >
-                  <Button icon={<DeleteIcon />} variant="subtle">
-                    Delete
-                  </Button>
-                </DocumentDeleteDialog>
-              </div>
-            }
-            modal
-            onOpenChange={setMoreOpen}
-            open={isMoreOpen}
-            side="bottom"
-            sideOffset={10}
-            {...props}
-          >
-            <Button
-              className={styles.moreButton}
-              icon={<MoreIcon />}
-              variant="secondary"
-            />
-          </Popover>
-        </div>
-      ) : null}
+      <div className={styles.more}>
+        <Popover
+          align="end"
+          content={
+            <div className={styles.morePopover}>
+              <DocumentDeleteDialog
+                documentId={document.id}
+                onDeleteDocument={handleDeleteDocument}
+                onOpenChange={handleDeleteDialogOpenChange}
+              >
+                <Button icon={<DeleteIcon />} variant="subtle">
+                  Delete
+                </Button>
+              </DocumentDeleteDialog>
+            </div>
+          }
+          modal
+          onOpenChange={setMoreOpen}
+          open={isMoreOpen}
+          side="bottom"
+          sideOffset={10}
+          {...props}
+        >
+          <Button
+            className={styles.moreButton}
+            icon={<MoreIcon />}
+            variant="secondary"
+          />
+        </Popover>
+      </div>
     </div>
   );
 }

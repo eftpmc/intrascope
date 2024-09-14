@@ -64,3 +64,14 @@
   place-items: center;
   text-align: center;
 }
+
+.selectItem {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4); /* Adjust spacing between icon and text */
+}
+
+.selectItem svg {
+  width: 16px;
+  height: 16px;
+}

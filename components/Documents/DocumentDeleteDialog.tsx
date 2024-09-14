@@ -1,5 +1,5 @@
 import { ComponentProps } from "react";
-import { deleteDocument } from "@/lib/actions";
+import { deleteDocumentFromSupabase } from "@/utils/supabase/supabaseData"; // Import Supabase delete operation
 import { Button } from "@/primitives/Button";
 import { Dialog } from "@/primitives/Dialog";
 import styles from "./DocumentDeleteDialog.module.css";
@@ -22,7 +22,8 @@ export function DocumentDeleteDialog({
       return;
     }
 
-    const { error } = await deleteDocument({
+    // Call the Supabase function to delete the document
+    const { error } = await deleteDocumentFromSupabase({
       documentId,
     });
 
@@ -30,8 +31,11 @@ export function DocumentDeleteDialog({
     onDeleteDocument();
 
     if (error) {
+      console.error("Error deleting document:", error);
       return;
     }
+
+    // You can add additional logic here if necessary (e.g., showing a success message)
   }
 
   return (

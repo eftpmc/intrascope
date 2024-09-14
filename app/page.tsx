@@ -1,12 +1,13 @@
+"use client"
+
+import { ComponentProps, ReactNode, useEffect } from "react";
+import { useRouter } from 'next/navigation'
+import { signInWithGoogle, checkSession } from "@/auth";
 import clsx from "clsx";
-import { redirect } from "next/navigation";
-import { ComponentProps, ReactNode } from "react";
-import { auth, signIn } from "@/auth";
-import { DASHBOARD_URL } from "@/constants";
 import { SignInIcon } from "@/icons";
-import { MarketingLayout } from "@/layouts/Marketing";
 import { Button, LinkButton } from "@/primitives/Button";
 import { Container } from "@/primitives/Container";
+import { MarketingLayout } from "@/layouts/Marketing"; // Assuming this is part of your project
 import styles from "./page.module.css";
 
 interface FeatureProps extends Omit<ComponentProps<"div">, "title"> {
@@ -23,34 +24,41 @@ function Feature({ title, description, className, ...props }: FeatureProps) {
   );
 }
 
-export default async function Index() {
-  const session = await auth();
+export default function Index() {
+  const router = useRouter()
 
-  // If logged in, go to dashboard
-  if (session) {
-    redirect(DASHBOARD_URL);
-  }
+  useEffect(() => {
+    const checkUserSession = async () => {
+      const sessionData = await checkSession();
+      const session = sessionData.session;
+      if (session) {
+        // Redirect to the dashboard if session exists
+        router.push("/dashboard")
+      }
+    };
+
+    checkUserSession();
+  }, []);
 
   return (
     <MarketingLayout>
       <Container className={styles.section}>
         <div className={styles.heroInfo}>
           <h1 className={styles.heroTitle}>
-            Kickstart your collaborative&nbsp;app
+            Take advantage of your college years
           </h1>
           <p className={styles.heroLead}>
-            Use the Liveblocks Starter Kit to build your document-based
-            collaborative app in&nbsp;minutes.
+            Use intrascope to find all student benefits, discounts, scholarships, and more.
           </p>
         </div>
         <div className={styles.heroActions}>
           <form
-            action={async () => {
-              "use server";
-              await signIn();
+            onSubmit={(e) => {
+              e.preventDefault();
+              signInWithGoogle();
             }}
           >
-            <Button icon={<SignInIcon />}>Sign in</Button>
+            <Button icon={<SignInIcon />}>Sign in with Google</Button>
           </form>
           <LinkButton
             href="https://liveblocks.io/docs/guides/nextjs-starter-kit"
@@ -65,57 +73,28 @@ export default async function Index() {
         <h2 className={styles.sectionTitle}>Features</h2>
         <div className={styles.featuresGrid}>
           <Feature
-            description={
-              <>
-                A collaborative whiteboard app with included share menu,
-                documents listing, users, groups, permissions, and more.
-              </>
-            }
-            title="Liveblocks"
+            description="AI is integrated into Intrascope to find more opportunities for you than any other provider."
+            title="AI"
           />
           <Feature
-            description={
-              <>
-                Best practices followed, using a mixture of SSR and custom API
-                endpoints. Modify documents from both client and server.
-              </>
-            }
-            title="Next.js"
+            description="We have the largest database of student discounts, benefits, and scholarships."
+            title="Our Database"
           />
           <Feature
-            description={
-              <>
-                Adjust our reusable interface & design system to fit your needs.
-              </>
-            }
-            title="User Interface"
+            description="We designed Intrascope to be as minimal, and to the point as possible."
+            title="Simplicity"
           />
           <Feature
-            description={
-              <>
-                All custom client and server functions are fully typed, and easy
-                to update.
-              </>
-            }
-            title="TypeScript"
+            description="We are always updating our database to include the latest, and best offers for students."
+            title="New Opportunities"
           />
           <Feature
-            description={
-              <>
-                Complete authentication, compatible with any NextAuth provider,
-                including GitHub, Google, Auth0, and many more.
-              </>
-            }
-            title="NextAuth.js"
+            description="Users are assigned profiles that keep information readily available."
+            title="User Profiles"
           />
           <Feature
-            description={
-              <>
-                See data update live using the SWR (state-while-revalidate)
-                library.
-              </>
-            }
-            title="SWR"
+            description="Inboxes keep the most updated offers in one place, making sure you never miss out."
+            title="Inbox"
           />
         </div>
       </Container>
