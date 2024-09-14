@@ -22,11 +22,11 @@ export function DocumentCreatePopover({
 }: Props) {
   const [disableButtons, setDisableButtons] = useState(false);
 
-  // Create a new document using Supabase, then handle post-creation logic
   async function createNewDocument(name: string, type: DocumentType) {
     setDisableButtons(true);
 
-    const result = await createDocumentInSupabase({
+    try {
+      const result = await createDocumentInSupabase({
       name,
       type,
       userId,
@@ -34,14 +34,21 @@ export function DocumentCreatePopover({
       groupIds: draft ? undefined : groupIds,
     });
 
-    // If this runs, there's an error and the creation failed
-    if (!result || result?.error || !result.data) {
+    if ('error' in result && result.error) {
       setDisableButtons(false);
-      return;
+      throw new Error('Failed to create document');
     }
 
-    // Success! You can redirect the user or handle the result here
+    if (!('data' in result)) {
+      setDisableButtons(false);
+      throw new Error('Unexpected response format');
+    }
+
+
     console.log("Document created:", result.data);
+    setDisableButtons(false);
+  } catch (error) {
+    console.error("Error creating document:", error);
     setDisableButtons(false);
   }
 
@@ -88,4 +95,5 @@ export function DocumentCreatePopover({
       {children}
     </Popover>
   );
+}
 }

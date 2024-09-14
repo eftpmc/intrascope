@@ -17,7 +17,7 @@ import styles from "./DocumentRow.module.css";
 interface Document {
   id: string;
   title: string;
-  type: string;
+  type: any;
   updated_at: string;
   user_id: string;
 }
