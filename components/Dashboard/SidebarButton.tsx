@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { ComponentProps } from "react";
-import { FileIcon } from "@/icons"; // Assuming you have the FileIcon component
+// Assuming you have the FileIcon component
 import styles from "./DashboardSidebar.module.css"; // Assuming this is where your styles are located
 
 interface SidebarButtonProps extends ComponentProps<"button"> {

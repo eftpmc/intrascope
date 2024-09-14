@@ -1,15 +1,15 @@
 "use client";
 
 import clsx from "clsx";
-import { useState, useEffect } from "react";
+import { useState, ReactNode } from "react";
 import { DashboardHeader, DashboardSidebar } from "@/components/Dashboard";
 import { Group, DocumentType } from "@/types";
-import { fetchDocumentsFromSupabase } from "@/utils/supabase/supabaseData"; // Fetch function
 import { DocumentsList } from "@/layouts/Documents/DocumentsList";
 import styles from "./Dashboard.module.css";
 
 interface Props {
   groups: Group[];
+  children?: ReactNode;
 }
 
 export function DashboardLayout({ groups, ...props }: Props) {

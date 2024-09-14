@@ -1,13 +1,9 @@
 import clsx from "clsx";
 import { usePathname } from "next/navigation";
 import { ComponentProps, useMemo } from "react";
-import {
-  DASHBOARD_DRAFTS_URL,
-  DASHBOARD_URL,
-} from "@/constants";
 import { FileIcon } from "@/icons";
-import { LinkButton, IconButton } from "@/primitives/Button";
-import { Group, DocumentType } from "@/types";
+import { IconButton, LinkButton } from "@/primitives/Button";
+import { DocumentType, Group } from "@/types";
 import { normalizeTrailingSlash } from "@/utils";
 import styles from "./DashboardSidebar.module.css";
 
