@@ -14,6 +14,21 @@
   font-weight: 500;
 }
 
+.inboxItem {
+  padding: 6px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.newDot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background-color: red;
+  border-radius: 50%;
+  margin-left: 8px;
+}
+
 .emptyState {
   display: flex;
   min-height: 320px;
@@ -39,4 +54,14 @@
 .addedToDocumentButton {
   display: flex;
   margin-top: var(--space-4);
+}
+
+.documentName {
+  font-size: var(--size-sm);
+  font-weight: 500;
+}
+
+.documentDate {
+  color: var(--color-text-lighter);
+  font-size: var(--size-xs);
 }

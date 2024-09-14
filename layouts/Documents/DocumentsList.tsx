@@ -2,23 +2,17 @@
 
 import clsx from "clsx";
 import { useState, useEffect } from "react";
-import { createClient } from "@/utils/supabase/client"; // Import Supabase client
 import { ComponentProps } from "react";
-import {
-  DocumentRowSkeleton,
-} from "@/components/Documents";
+import { DocumentRowSkeleton } from "@/components/Documents";
 import { DocumentRowGroup } from "@/components/Documents/DocumentRowGroup";
 import { PlusIcon } from "@/icons";
 import { Button } from "@/primitives/Button";
 import { Container } from "@/primitives/Container";
 import { Select } from "@/primitives/Select";
-import { Spinner } from "@/primitives/Spinner";
 import { DocumentType } from "@/types";
 import styles from "./DocumentsList.module.css";
 import { capitalize } from "@/utils/capitalize";
-
-// Load `x` documents at a time
-const DOCUMENT_LOAD_LIMIT = 10;
+import { fetchDocumentsFromSupabase } from "@/utils/supabase/supabaseData"; // Import the new fetch function
 
 interface Props extends ComponentProps<"div"> {
   filter?: "all" | "drafts" | "group";
@@ -33,26 +27,18 @@ export function DocumentsList({
   const [documents, setDocuments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClient();
 
-  // Fetch documents from the `data` table in Supabase, filtering by genre
+  // Fetch documents from Supabase, filtering by genre
   useEffect(() => {
     const fetchDocuments = async () => {
       setLoading(true);
       setError(null);
 
-      // Supabase query to fetch documents by genre
-      let query = supabase.from("data").select("*");
-
-      if (documentType !== "all") {
-        query = query.eq("type", documentType); // Filter by genre
-      }
-
-      const { data, error } = await query;
+      // Call the new function in `supabaseData`
+      const { data, error } = await fetchDocumentsFromSupabase(documentType);
 
       if (error) {
         setError("Error fetching documents");
-        console.error("Error fetching documents:", error);
       } else {
         setDocuments(data || []); // If data is null, set an empty array
       }
@@ -61,7 +47,7 @@ export function DocumentsList({
     };
 
     fetchDocuments();
-  }, [documentType, filter, supabase]);
+  }, [documentType]);
 
   const createDocumentButton = (
     <Button icon={<PlusIcon />}>New Document</Button>
@@ -77,22 +63,21 @@ export function DocumentsList({
       {...props}
     >
       <div className={styles.header}>
-        <h1 className={styles.headerTitle}>Offers</h1>
+        <Select
+          initialValue="all"
+          items={[
+            { value: "all", title: "All" },
+            { value: "entertainment", title: "Entertainment" },
+            { value: "fashion", title: "Fashion" },
+            { value: "tech", title: "Tech" },
+            { value: "food", title: "Food" },
+            { value: "health", title: "Health" },
+            { value: "other", title: "Other" },
+          ]}
+          onChange={(value: "all" | DocumentType) => setDocumentType(value)}
+          className={styles.headerSelect}
+        />
         <div className={styles.headerActions}>
-          <Select
-            initialValue="all"
-            items={[
-              { value: "all", title: "All" },
-              { value: "entertainment", title: "Entertainment" },
-              { value: "fashion", title: "Fashion" },
-              { value: "tech", title: "Tech" },
-              { value: "food", title: "Food" },
-              { value: "health", title: "Health" },
-              { value: "other", title: "Other" },
-            ]}
-            onChange={(value: "all" | DocumentType) => setDocumentType(value)}
-            className={styles.headerSelect}
-          />
           {createDocumentButton}
         </div>
       </div>
