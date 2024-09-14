@@ -13,6 +13,13 @@ interface Props extends Omit<ComponentProps<typeof Popover>, "content"> {
   userId: DocumentUser["id"];
 }
 
+interface DocumentCreatePopoverProps {
+  groupIds: string[];
+  userId: string;
+  draft: boolean;
+  children: React.ReactNode;
+}
+
 export function DocumentCreatePopover({
   groupIds,
   userId,
