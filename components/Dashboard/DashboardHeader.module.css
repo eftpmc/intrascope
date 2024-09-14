@@ -4,6 +4,7 @@
   height: 100%;
   padding: 0 var(--space-8);
   grid-template-columns: 1fr 2fr 1fr;
+  align-items: center;
 }
 
 .menu,
@@ -98,9 +99,20 @@
   place-content: center;
 }
 
+/* Hide logo on screens smaller than 1024px */
+@media (max-width: 1024px) {
+  .logo {
+    display: none;
+  }
+
+  .header {
+    grid-template-columns: 1fr 1fr; /* Two columns: left for menu, right for profile */
+  }
+}
+
 @media (min-width: 1024px) {
   .header {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: 1fr 2fr 1fr;
   }
 
   .menu {
@@ -109,11 +121,5 @@
 
   .logo {
     place-content: flex-start;
-  }
-}
-
-@media (max-width: 1024px) {
-  .logo {
-    display: none;
   }
 }
