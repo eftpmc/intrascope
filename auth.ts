@@ -1,7 +1,6 @@
 // utils/auth.ts
 import { createClient } from "@/utils/supabase/client";
 const supabase = createClient();
-// Function to handle Google OAuth sign-in
 export const signInWithGoogle = async () => {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",

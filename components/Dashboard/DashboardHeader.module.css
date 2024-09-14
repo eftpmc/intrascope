@@ -111,3 +111,9 @@
     place-content: flex-start;
   }
 }
+
+@media (max-width: 1024px) {
+  .logo {
+    display: none;
+  }
+}

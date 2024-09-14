@@ -77,7 +77,7 @@ export function DocumentsList({
       {...props}
     >
       <div className={styles.header}>
-        <h1 className={styles.headerTitle}>{headerTitle}</h1> {/* Update title */}
+        <h1 className={styles.headerTitle}>Offers</h1>
         <div className={styles.headerActions}>
           <Select
             initialValue="all"
