@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
-import { ComponentProps, useCallback, useMemo, useState, useEffect } from "react";
+import { ComponentProps, useCallback, useState } from "react";
 import { DOCUMENT_URL } from "@/constants";
 import { DeleteIcon, MoreIcon } from "@/icons";
 import { AvatarStack } from "@/primitives/AvatarStack";

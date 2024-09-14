@@ -1,8 +1,6 @@
 import clsx from "clsx";
 import { ComponentProps } from "react";
-import { Button, LinkButton } from "@/primitives/Button";
-import { Link } from "@/primitives/Link";
-import { Spinner } from "@/primitives/Spinner";
+import { Button } from "@/primitives/Button";
 import styles from "./Inbox.module.css";
 
 function InboxContent(props: ComponentProps<"div">) {

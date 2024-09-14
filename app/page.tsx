@@ -1,13 +1,13 @@
 "use client"
 
-import { ComponentProps, ReactNode, useEffect } from "react";
-import { useRouter } from 'next/navigation'
-import { signInWithGoogle, checkSession } from "@/auth";
 import clsx from "clsx";
+import { useRouter } from 'next/navigation'
+import { ComponentProps, ReactNode, useEffect } from "react";
+import { checkSession, signInWithGoogle } from "@/auth";
 import { SignInIcon } from "@/icons";
+import { MarketingLayout } from "@/layouts/Marketing"; // Assuming this is part of your project
 import { Button, LinkButton } from "@/primitives/Button";
 import { Container } from "@/primitives/Container";
-import { MarketingLayout } from "@/layouts/Marketing"; // Assuming this is part of your project
 import styles from "./page.module.css";
 
 interface FeatureProps extends Omit<ComponentProps<"div">, "title"> {

@@ -3,14 +3,14 @@
 import clsx from "clsx";
 import Link from "next/link";
 import { ComponentProps, MouseEventHandler, useEffect, useState } from "react";
+import { getUserProfile, handleSignOut } from "@/auth";
 import { CrossIcon, MenuIcon, SignOutIcon } from "@/icons";
 import { Avatar } from "@/primitives/Avatar";
 import { Button } from "@/primitives/Button";
 import { Popover } from "@/primitives/Popover";
+import { createClient } from '@/utils/supabase/client'
 import { InboxPopover } from "../Inbox";
 import { Logo } from "../Logo";
-import { getUserProfile, handleSignOut } from "@/auth";
-import { createClient } from '@/utils/supabase/client'
 import styles from "./DashboardHeader.module.css";
 
 interface Props extends ComponentProps<"header"> {

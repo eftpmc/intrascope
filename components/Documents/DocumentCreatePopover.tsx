@@ -1,9 +1,9 @@
 import { ComponentProps, useState } from "react";
 import { PlusIcon } from "@/icons";
-import { createDocumentInSupabase } from "@/utils/supabase/supabaseData";
 import { Button } from "@/primitives/Button";
 import { Popover } from "@/primitives/Popover";
 import { Document, DocumentGroup, DocumentType, DocumentUser } from "@/types";
+import { createDocumentInSupabase } from "@/utils/supabase/supabaseData";
 import styles from "./DocumentCreatePopover.module.css";
 
 interface Props extends Omit<ComponentProps<typeof Popover>, "content"> {

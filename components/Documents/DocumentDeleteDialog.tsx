@@ -1,7 +1,7 @@
 import { ComponentProps } from "react";
-import { deleteDocumentFromSupabase } from "@/utils/supabase/supabaseData"; // Import Supabase delete operation
 import { Button } from "@/primitives/Button";
 import { Dialog } from "@/primitives/Dialog";
+import { deleteDocumentFromSupabase } from "@/utils/supabase/supabaseData"; // Import Supabase delete operation
 import styles from "./DocumentDeleteDialog.module.css";
 
 interface Props

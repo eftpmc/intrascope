@@ -1,8 +1,8 @@
 "use client"
 
-import { checkSession } from '@/auth';
 import { useRouter } from 'next/navigation';
 import React, { useEffect } from 'react';
+import { checkSession } from '@/auth';
 import {DocumentsLayout} from '@/layouts/Documents'
 
 export default function DashboardPage() {

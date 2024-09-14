@@ -3,10 +3,9 @@ import { usePathname } from "next/navigation";
 import { ComponentProps, useMemo } from "react";
 import {
   DASHBOARD_DRAFTS_URL,
-  DASHBOARD_GROUP_URL,
   DASHBOARD_URL,
 } from "@/constants";
-import { FileIcon, FolderIcon } from "@/icons";
+import { FileIcon } from "@/icons";
 import { LinkButton } from "@/primitives/Button";
 import { Group } from "@/types";
 import { normalizeTrailingSlash } from "@/utils";
