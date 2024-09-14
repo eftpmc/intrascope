@@ -73,6 +73,7 @@ export function DashboardSidebar({ onCategoryChange, className, groups, ...props
       <nav className={styles.navigation}>
         <div className={styles.category}>
           <ul className={styles.list}>
+            <span className={styles.categoryTitle}>Offers</span>
             <li>
               <SidebarButton onClick={() => onCategoryChange("all")} icon={<FileIcon />}>
                 All

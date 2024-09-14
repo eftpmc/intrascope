@@ -69,3 +69,8 @@
   font-size: var(--size-sm);
   font-weight: 500;
 }
+
+
+.wfull {
+  width: 100%;
+}

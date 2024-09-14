@@ -80,6 +80,7 @@ export function IconButton({
       className={clsx(
         className,
         styles.button,
+        styles.wfull,
         iconButton || (icon && !children) ? styles.iconButton : undefined,
         {
           [styles.buttonPrimary]: variant === "primary",
