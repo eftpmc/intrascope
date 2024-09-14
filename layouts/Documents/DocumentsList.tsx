@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 import { createClient } from "@/utils/supabase/client"; // Import Supabase client
 import { ComponentProps } from "react";
 import {
-  DocumentCreatePopover,
   DocumentRowSkeleton,
 } from "@/components/Documents";
 import { DocumentRowGroup } from "@/components/Documents/DocumentRowGroup";
@@ -65,14 +64,7 @@ export function DocumentsList({
   }, [documentType, filter, supabase]);
 
   const createDocumentButton = (
-    <DocumentCreatePopover
-      align="end"
-      draft={filter === "drafts" || filter === "all"}
-      sideOffset={12}
-      userId={""}
-    >
-      <Button icon={<PlusIcon />}>New Document</Button>
-    </DocumentCreatePopover>
+    <Button icon={<PlusIcon />}>New Document</Button>
   );
 
   // Define a header that updates based on the selected document type
