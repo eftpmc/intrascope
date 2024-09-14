@@ -9,5 +9,5 @@ type Props = {
 
 export async function DocumentsLayout({ filter, groupId }: Props) {
 
-  return <DocumentsList filter={filter} />;
+  return <DocumentsList category="all" />;
 }

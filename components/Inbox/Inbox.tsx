@@ -11,7 +11,6 @@ interface Document {
 }
 
 function InboxContent({ documents }: { documents: Document[] }) {
-  console.log(documents)
   return (
     <div>
       {documents.length > 0 ? (

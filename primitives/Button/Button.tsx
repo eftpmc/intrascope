@@ -66,3 +66,32 @@ export function LinkButton({
     </Link>
   );
 }
+
+export function IconButton({
+  variant = "primary",
+  icon,
+  iconButton,
+  children,
+  className,
+  ...props
+}: ComponentProps<typeof Button> & Props) {
+  return (
+    <button
+      className={clsx(
+        className,
+        styles.button,
+        iconButton || (icon && !children) ? styles.iconButton : undefined,
+        {
+          [styles.buttonPrimary]: variant === "primary",
+          [styles.buttonSecondary]: variant === "secondary",
+          [styles.buttonSubtle]: variant === "subtle",
+          [styles.buttonDestructive]: variant === "destructive",
+        }
+      )}
+      {...props}
+    >
+      {icon && <span className={styles.icon}>{icon}</span>}
+      {children && <span className={styles.label}>{children}</span>}
+    </button>
+  );
+}

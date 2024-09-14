@@ -9,52 +9,63 @@ import { PlusIcon } from "@/icons";
 import { Button } from "@/primitives/Button";
 import { Container } from "@/primitives/Container";
 import { Select } from "@/primitives/Select";
-import { DocumentType } from "@/types";
 import styles from "./DocumentsList.module.css";
-import { capitalize } from "@/utils/capitalize";
 import { fetchDocumentsFromSupabase } from "@/utils/supabase/supabaseData"; // Import the new fetch function
 
 interface Props extends ComponentProps<"div"> {
-  filter?: "all" | "drafts" | "group";
+  category: any;
 }
 
 export function DocumentsList({
-  filter = "all",
+  category,
   className,
   ...props
 }: Props) {
-  const [documentType, setDocumentType] = useState<DocumentType | "all">("all");
   const [documents, setDocuments] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [filter, setFilter] = useState<"mostRecent" | "leastRecent" | "alphabetical" | "reverseAlphabetical">("mostRecent");
 
-  // Fetch documents from Supabase, filtering by genre
   useEffect(() => {
     const fetchDocuments = async () => {
       setLoading(true);
       setError(null);
 
-      // Call the new function in `supabaseData`
-      const { data, error } = await fetchDocumentsFromSupabase(documentType);
+      const { data, error } = await fetchDocumentsFromSupabase(category);
 
       if (error) {
         setError("Error fetching documents");
       } else {
-        setDocuments(data || []); // If data is null, set an empty array
+        const sortedData = data || [];
+
+        // Apply sorting based on the selected filter
+        switch (filter) {
+          case "mostRecent":
+            sortedData.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+            break;
+          case "leastRecent":
+            sortedData.sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+            break;
+          case "alphabetical":
+            sortedData.sort((a, b) => a.title.localeCompare(b.title));
+            break;
+          case "reverseAlphabetical":
+            sortedData.sort((a, b) => b.title.localeCompare(a.title));
+            break;
+        }
+
+        setDocuments(sortedData);
       }
 
       setLoading(false);
     };
 
     fetchDocuments();
-  }, [documentType]);
+  }, [category, filter]);
 
   const createDocumentButton = (
     <Button icon={<PlusIcon />}>New Document</Button>
   );
-
-  // Define a header that updates based on the selected document type
-  const headerTitle = documentType === "all" ? capitalize(filter) : capitalize(documentType);
 
   return (
     <Container
@@ -64,22 +75,17 @@ export function DocumentsList({
     >
       <div className={styles.header}>
         <Select
-          initialValue="all"
+          initialValue="mostRecent"
           items={[
-            { value: "all", title: "All" },
-            { value: "entertainment", title: "Entertainment" },
-            { value: "fashion", title: "Fashion" },
-            { value: "tech", title: "Tech" },
-            { value: "food", title: "Food" },
-            { value: "health", title: "Health" },
-            { value: "other", title: "Other" },
+            { value: "mostRecent", title: "Most Recent" },
+            { value: "leastRecent", title: "Least Recent" },
+            { value: "alphabetical", title: "Alphabetical" },
+            { value: "reverseAlphabetical", title: "Reverse Alphabetical" },
           ]}
-          onChange={(value: "all" | DocumentType) => setDocumentType(value)}
+          onChange={(value: "mostRecent" | "leastRecent" | "alphabetical" | "reverseAlphabetical") => setFilter(value)}
           className={styles.headerSelect}
         />
-        <div className={styles.headerActions}>
-          {createDocumentButton}
-        </div>
+        <div className={styles.headerActions}>{createDocumentButton}</div>
       </div>
 
       <div className={styles.container}>
@@ -94,14 +100,12 @@ export function DocumentsList({
             <p>{error}</p>
           </div>
         ) : documents.length > 0 ? (
-          <>
-            <DocumentRowGroup
-              documents={documents}
-              revalidateDocuments={function (): void {
-                throw new Error("Function not implemented.");
-              }}
-            />
-          </>
+          <DocumentRowGroup
+            documents={documents}
+            revalidateDocuments={function (): void {
+              throw new Error("Function not implemented.");
+            }}
+          />
         ) : (
           <div className={styles.emptyState}>
             <p>No documents yet.</p>

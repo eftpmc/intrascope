@@ -31,7 +31,15 @@ export type Document = {
   type: DocumentType;
 };
 
-export type DocumentType = "text" | "whiteboard" | "spreadsheet";
+export type DocumentType = 
+  | "all"
+  | "entertainment"
+  | "fashion"
+  | "tech"
+  | "food"
+  | "health"
+  | "other";
+
 
 export type DocumentGroup = Group & {
   access: DocumentAccess;

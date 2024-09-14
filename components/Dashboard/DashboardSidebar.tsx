@@ -6,18 +6,25 @@ import {
   DASHBOARD_URL,
 } from "@/constants";
 import { FileIcon } from "@/icons";
-import { LinkButton } from "@/primitives/Button";
-import { Group } from "@/types";
+import { LinkButton, IconButton } from "@/primitives/Button";
+import { Group, DocumentType } from "@/types";
 import { normalizeTrailingSlash } from "@/utils";
 import styles from "./DashboardSidebar.module.css";
 
 interface Props extends ComponentProps<"div"> {
   groups: Group[];
+  onCategoryChange: (category: DocumentType | "all") => void;
 }
 
 interface SidebarLinkProps
   extends Omit<ComponentProps<typeof LinkButton>, "href"> {
   href: string;
+}
+
+interface SidebarButtonProps extends ComponentProps<"button"> {
+  onClick: () => void;
+  icon?: React.ReactNode;
+  className?: string;
 }
 
 function SidebarLink({
@@ -45,21 +52,60 @@ function SidebarLink({
   );
 }
 
-export function DashboardSidebar({ className, groups, ...props }: Props) {
+function SidebarButton({
+  onClick,
+  children,
+  className,
+  ...props
+}: SidebarButtonProps) {
+
+  return (
+    <IconButton
+      className={clsx(className, styles.sidebarLink)}
+      onClick={onClick}
+      variant="subtle"
+      {...props}
+    >
+      {children}
+    </IconButton>
+  );
+}
+
+export function DashboardSidebar({ onCategoryChange, className, groups, ...props }: Props) {
   return (
     <div className={clsx(className, styles.sidebar)} {...props}>
       <nav className={styles.navigation}>
         <div className={styles.category}>
           <ul className={styles.list}>
             <li>
-              <SidebarLink href={DASHBOARD_URL} icon={<FileIcon />}>
-                Dashboard
-              </SidebarLink>
+              <SidebarButton onClick={() => onCategoryChange("all")} icon={<FileIcon />}>
+                All
+              </SidebarButton>
             </li>
             <li>
-              <SidebarLink href={DASHBOARD_DRAFTS_URL} icon={<FileIcon />}>
-                Discounts
-              </SidebarLink>
+              <SidebarButton onClick={() => onCategoryChange("food")} icon={<FileIcon />}>
+                Food & Drink
+              </SidebarButton>
+            </li>
+            <li>
+              <SidebarButton onClick={() => onCategoryChange("fashion")} icon={<FileIcon />}>
+                Fashion
+              </SidebarButton>
+            </li>
+            <li>
+              <SidebarButton onClick={() => onCategoryChange("tech")} icon={<FileIcon />}>
+                Tech
+              </SidebarButton>
+            </li>
+            <li>
+              <SidebarButton onClick={() => onCategoryChange("health")} icon={<FileIcon />}>
+                Health
+              </SidebarButton>
+            </li>
+            <li>
+              <SidebarButton onClick={() => onCategoryChange("entertainment")} icon={<FileIcon />}>
+                Entertainment
+              </SidebarButton>
             </li>
           </ul>
         </div>
