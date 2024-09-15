@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useState } from 'react';
-import { createClient } from '@/utils/supabase/client';
-import { Container } from '@/primitives/Container';
-import { Table, TableHeader, TableBody, TableRow, TableCell, TableHeaderCell } from '@/primitives/Table';
-import { Button } from '@/primitives/Button';
-import { Input } from '@/primitives/Input';
-import { Logo } from '@/components/Logo';
-import { IoTrashBinOutline, IoSaveOutline } from "react-icons/io5";
-import styles from './page.module.css';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { IoSaveOutline, IoTrashBinOutline } from "react-icons/io5";
+import { Logo } from '@/components/Logo';
+import { Button } from '@/primitives/Button';
+import { Container } from '@/primitives/Container';
+import { Input } from '@/primitives/Input';
+import { Table, TableBody, TableCell, TableHeader, TableHeaderCell, TableRow } from '@/primitives/Table';
+import { createClient } from '@/utils/supabase/client';
+import styles from './page.module.css';
 
 const supabase = createClient();
 
@@ -48,7 +48,7 @@ export default function AdminDashboard() {
         console.error('Error updating data:', error);
       } else {
         fetchData();
-        setEditingData((prevState) => {
+        setEditingData((prevState: any) => {
           const newState = { ...prevState };
           delete newState[id];
           return newState;

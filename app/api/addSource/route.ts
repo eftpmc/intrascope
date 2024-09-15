@@ -1,8 +1,8 @@
-import { NextRequest, NextResponse } from 'next/server';
 import axios from 'axios';
 import * as cheerio from 'cheerio';
-import { createClient } from '@/utils/supabase/server';
+import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import { createClient } from '@/utils/supabase/server';
 
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
@@ -52,24 +52,7 @@ export async function POST(request: NextRequest) {
     // Determine the type based on the content
     const type = discounts.length > 0 ? 'student_discount' : 'other';
 
-    // Insert the new source and discounts into the database
-    const { error } = await supabase
-      .from('data')
-      .insert([
-        { 
-          title, 
-          type, 
-          description,
-          url,
-          discounts: JSON.stringify(discounts),
-          updated_at: new Date().toISOString()
-        }
-      ]);
-
-    if (error) {
-      console.error('Error inserting data:', error);
-      return NextResponse.json({ error: 'Failed to add source' }, { status: 500 });
-    }
+    console.log(discounts)
 
     // Return a simple 200 status code
     return NextResponse.json({}, { status: 200 });
