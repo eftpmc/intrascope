@@ -1,0 +1,59 @@
+.adminDashboard {
+    min-height: 100vh;
+    background: var(--color-surface);
+  }
+  
+  .header {
+    background: var(--color-surface-elevated);
+    border-bottom: 1px solid var(--color-border);
+    padding: var(--space-8) 0;
+  }
+  
+  .headerContent {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .main {
+    padding: var(--space-16) 0;
+  }
+  
+  .tableContainer {
+    margin-bottom: var(--space-8);
+    overflow: hidden;
+    border-radius: var(--radius);
+  }
+
+  .actionButtons {
+    display: flex;
+    gap: var(--space-2);
+  }
+  
+  .addForm {
+    display: flex;
+    gap: var(--space-4);
+    margin-top: var(--space-8);
+    padding: var(--space-6);
+    background: var(--color-surface-elevated);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius);
+  }
+  
+  .addForm > input {
+    flex: 1;
+  }
+  
+  .addForm > button {
+    flex: 0 0 auto;
+  }
+  
+  @media (max-width: 640px) {
+    .addForm {
+      flex-direction: column;
+    }
+    
+    .addForm > button {
+      width: 100%;
+    }
+  }
