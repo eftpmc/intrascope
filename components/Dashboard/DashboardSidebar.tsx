@@ -1,10 +1,9 @@
 "use client"
 
 import clsx from "clsx";
-import { useEffect, useState } from "react";
-import { getUserProfile, getUser } from "@/auth";
 import { usePathname } from "next/navigation";
-import { ComponentProps, useMemo } from "react";
+import { ComponentProps, useEffect , useMemo, useState } from "react";
+import { getUser, getUserProfile } from "@/auth";
 import { FileIcon } from "@/icons";
 import { IconButton, LinkButton } from "@/primitives/Button";
 import { DocumentType, Group } from "@/types";

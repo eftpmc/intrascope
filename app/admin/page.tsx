@@ -1,7 +1,7 @@
 "use client"
 
-import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 import { getUser, getUserProfile } from "@/auth";
 
 const AdminDashboard = () => {
