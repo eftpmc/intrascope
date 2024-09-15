@@ -28,11 +28,22 @@ export const checkSession = async () => {
   return session;
 };
 
+export const getUser = async () => {
+    const { data: { user }, error } = await supabase.auth.getUser();
+  
+    if (error) {
+      console.error("Error fetching user:", error.message);
+      return null;
+    }
+  
+    return user;
+  };  
+
 // Function to get the current user profile information
 export const getUserProfile = async (userId: string) => {
   const { data, error } = await supabase
     .from('profiles')
-    .select(`full_name, avatar_url`)
+    .select(`full_name, avatar_url, role`)
     .eq('id', userId)
     .single();
 

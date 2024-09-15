@@ -1,4 +1,8 @@
+"use client"
+
 import clsx from "clsx";
+import { useEffect, useState } from "react";
+import { getUserProfile, getUser } from "@/auth";
 import { usePathname } from "next/navigation";
 import { ComponentProps, useMemo } from "react";
 import { FileIcon } from "@/icons";
@@ -68,6 +72,22 @@ function SidebarButton({
 }
 
 export function DashboardSidebar({ onCategoryChange, className, groups, ...props }: Props) {
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      const user = await getUser();  // Fetch user directly
+      if (user) {
+        const profile = await getUserProfile(user.id);  // Use user id from getUser
+        if (profile && profile.role === 'admin') {
+          setIsAdmin(true);
+        }
+      }
+    };
+
+    fetchProfile();
+  }, []);
+
   return (
     <div className={clsx(className, styles.sidebar)} {...props}>
       <nav className={styles.navigation}>
@@ -104,6 +124,16 @@ export function DashboardSidebar({ onCategoryChange, className, groups, ...props
                 Entertainment
               </SidebarButton>
             </li>
+
+            {isAdmin && (
+              <div className={styles.adminLinkContainer}>
+                <ul className={styles.list}>
+                  <li>
+                    <SidebarLink href="/admin">Admin Dashboard</SidebarLink>
+                  </li>
+                </ul>
+              </div>
+            )}
           </ul>
         </div>
         {/* <div className={styles.category}>
