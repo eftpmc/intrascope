@@ -1,7 +1,9 @@
-"use client";
+"use client"
 
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { checkSession } from '@/auth';
+import { useRouter } from 'next/navigation';
 import { IoSaveOutline, IoTrashBinOutline } from "react-icons/io5";
 import { Logo } from '@/components/Logo';
 import { Button } from '@/primitives/Button';
@@ -17,6 +19,20 @@ export default function AdminDashboard() {
   const [data, setData] = useState<any[]>([]);
   const [editingData, setEditingData] = useState<any>({});
   const [newSourceUrl, setNewSourceUrl] = useState('');
+  const [loading, setLoading] = useState(false);
+  const router = useRouter()
+
+  useEffect(() => {
+    const checkUserSession = async () => {
+      const sessionData = await checkSession();
+      const session = sessionData.session;
+      if (session) {
+        router.push("/dashboard")
+      }
+    };
+
+    checkUserSession();
+  }, []);
 
   useEffect(() => {
     fetchData();
@@ -72,6 +88,7 @@ export default function AdminDashboard() {
 
   async function handleAddSource(e: React.FormEvent) {
     e.preventDefault();
+    setLoading(true);  // Set loading state to true
     try {
       const response = await fetch('/api/addSource', {
         method: 'POST',
@@ -80,7 +97,7 @@ export default function AdminDashboard() {
         },
         body: JSON.stringify({ url: newSourceUrl }),
       });
-      
+
       if (response.ok) {
         setNewSourceUrl(''); // Reset form
         fetchData(); // Refresh the data
@@ -89,6 +106,8 @@ export default function AdminDashboard() {
       }
     } catch (error) {
       console.error('Error adding new source:', error);
+    } finally {
+      setLoading(false);  // Reset loading state
     }
   }
 
@@ -134,21 +153,21 @@ export default function AdminDashboard() {
                     </TableCell>
                     <TableCell>{new Date(item.updated_at).toLocaleString()}</TableCell>
                     <TableCell>
-                    <div className={styles.actionButtons}>
-                      <Button
-                        onClick={() => saveChanges(item.id)}
-                        variant="subtle"
-                        title="Save"
-                      >
-                        <IoSaveOutline className="w-5 h-5" />
-                      </Button>
-                      <Button
-                        onClick={() => deleteItem(item.id)}
-                        variant="subtle"
-                        title="Delete"
-                      >
-                        <IoTrashBinOutline className="w-5 h-5" />
-                      </Button>
+                      <div className={styles.actionButtons}>
+                        <Button
+                          onClick={() => saveChanges(item.id)}
+                          variant="subtle"
+                          title="Save"
+                        >
+                          <IoSaveOutline className="w-5 h-5" />
+                        </Button>
+                        <Button
+                          onClick={() => deleteItem(item.id)}
+                          variant="subtle"
+                          title="Delete"
+                        >
+                          <IoTrashBinOutline className="w-5 h-5" />
+                        </Button>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -156,7 +175,7 @@ export default function AdminDashboard() {
               </TableBody>
             </Table>
           </div>
-          
+
           <form onSubmit={handleAddSource} className={styles.addForm}>
             <Input
               type="url"
@@ -165,8 +184,8 @@ export default function AdminDashboard() {
               onChange={(e) => setNewSourceUrl(e.target.value)}
               required
             />
-            <Button type="submit" variant="primary">
-              Submit
+            <Button type="submit" variant="primary" disabled={loading}>
+              {loading ? 'Submitting...' : 'Submit'}
             </Button>
           </form>
         </Container>

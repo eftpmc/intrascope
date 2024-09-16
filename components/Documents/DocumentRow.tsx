@@ -17,7 +17,9 @@ import styles from "./DocumentRow.module.css";
 interface Document {
   id: string;
   title: string;
+  link: string;
   type: any;
+  summary: any;
   updated_at: string;
   user_id: string;
 }
@@ -60,7 +62,7 @@ export function DocumentRow({
 
   return (
     <div className={clsx(className, styles.row)} {...props}>
-      <Link className={clsx(styles.container, styles.link)} href={url}>
+      <Link className={clsx(styles.container, styles.link)} href={document.link} target="_blank">
         <div className={styles.icon}>
           <DocumentIcon type={document.type} />
         </div>
@@ -69,7 +71,7 @@ export function DocumentRow({
             <span>{document.title}</span>
           </span>
           <span className={styles.documentDate}>
-            Edited {formatDistanceToNow(date)} ago
+            <span>{document.summary}</span>
           </span>
         </div>
         {others && (
