@@ -1,3 +1,4 @@
+import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
@@ -7,7 +8,7 @@ import { createClient } from '@/utils/supabase/client';
 const openai = new OpenAI({
   organization: "org-31Ar3v3bAXi7nTb9fxadrYW2",
   project: "proj_JYPxFzMdSOpAa6H4PiYalYqV",
-  timeout: 25000, // Reduce OpenAI API timeout to 15 seconds per request
+  timeout: 25000, // Ensure response within the 25-second time limit
 });
 
 // Define the structure of a discount object
@@ -19,7 +20,6 @@ interface Discount {
   updated_at: string;
 }
 
-// Function to break content into smaller chunks, limiting the number of chunks
 const chunkContent = (content: string, chunkSize: number = 2000, maxChunks: number = 5): string[] => {
   const chunks = [];
   for (let i = 0; i < content.length && chunks.length < maxChunks; i += chunkSize) {
@@ -31,13 +31,6 @@ const chunkContent = (content: string, chunkSize: number = 2000, maxChunks: numb
 // Function to clean up invalid JSON returned by OpenAI
 function cleanInvalidJSON(jsonString: string): string {
   return jsonString.replace(/,\s*}/g, '}').replace(/,\s*]/g, ']');
-}
-
-// Function to remove unnecessary parts of HTML (scripts, styles, etc.)
-function trimHTMLContent(html: string): string {
-    const $ = cheerio.load(html); // Now we're correctly loading the HTML
-    $('script, style, noscript, iframe').remove(); // Remove unnecessary elements
-    return $.text(); // Extract only text content
 }
 
 // Function to check for duplicates and organize existing discounts
@@ -121,15 +114,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'URL is required' }, { status: 400 });
     }
 
-    // Fetch the content of the URL with a timeout of 10 seconds
-    const response = await fetch(url);
-    const html = await response.text();
+    // Fetch the content of the URL
+    const response = await axios.get(url);
+    const html = response.data;
 
-    // Trim the HTML content to only include meaningful text
-    const trimmedContent = trimHTMLContent(html);
+    // Parse the HTML content using Cheerio
+    const $ = cheerio.load(html);
+    const pageContent = $.root().find('body').text();
 
-    // Break content into chunks to avoid truncation, with a limit on the number of chunks
-    const contentChunks = chunkContent(trimmedContent, 2000, 5);
+    // Break content into chunks to avoid truncation
+    const contentChunks = chunkContent(pageContent);
 
     // Process all chunks concurrently and fetch discounts
     const allDiscounts = await processChunks(contentChunks);
