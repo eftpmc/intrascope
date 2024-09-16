@@ -171,6 +171,4 @@ export async function POST(request: NextRequest) {
   }
 }
 
-export const config = {
-  runtime: 'edge', // Enable edge function runtime
-};
+export const runtime = "edge"
