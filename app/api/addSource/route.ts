@@ -8,6 +8,7 @@ import { createClient } from '@/utils/supabase/client';
 const openai = new OpenAI({
   organization: "org-31Ar3v3bAXi7nTb9fxadrYW2",
   project: "proj_JYPxFzMdSOpAa6H4PiYalYqV",
+  timeout: 120000,
 });
 
 // Define the structure of a discount object
@@ -92,7 +93,6 @@ export async function POST(request: NextRequest) {
           {
             role: "system",
             content: `You are an AI that extracts student discounts and offers from blog content.
-                      Exclude generic discounts, guides, and collections like "Best Student Discounts" or "Top Deals for 2024". 
                       Focus solely on unique offers from individual companies that provide clear and valuable discounts. 
                       Only return discounts that have a link to the offer. 
                       Return a **list** of discounts in **valid JSON array format** without additional formatting.
@@ -107,7 +107,7 @@ export async function POST(request: NextRequest) {
           {
             role: "user",
             content: `Extract all relevant offers, deals, and discounts, including student discounts, from the following page content:\n\n${chunk}`
-          }
+          } 
         ],
       });
 
