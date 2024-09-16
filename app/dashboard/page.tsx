@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import React, { useEffect } from 'react';
-import { getUserProfile, getUser } from '@/auth';
+import { getUser, getUserProfile } from '@/auth';
 import { DocumentsLayout } from '@/layouts/Documents'
 
 export default function DashboardPage() {
