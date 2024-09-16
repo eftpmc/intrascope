@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { IoSaveOutline, IoTrashBinOutline } from "react-icons/io5";
-import { checkSession } from '@/auth';
+import { getUser, getUserProfile } from '@/auth';
 import { Logo } from '@/components/Logo';
 import { Button } from '@/primitives/Button';
 import { Container } from '@/primitives/Container';
@@ -23,15 +23,17 @@ export default function AdminDashboard() {
   const router = useRouter()
 
   useEffect(() => {
-    const checkUserSession = async () => {
-      const sessionData = await checkSession();
-      const session = sessionData.session;
-      if (session) {
-        router.push("/dashboard")
+    const fetchProfile = async () => {
+      const user = await getUser();
+      if (user) {
+        const profile = await getUserProfile(user.id);  // Use user id from getUser
+        if (profile && profile.role != 'admin') {
+          router.push("/dashboard")
+        }
       }
     };
 
-    checkUserSession();
+    fetchProfile();
   }, []);
 
   useEffect(() => {
