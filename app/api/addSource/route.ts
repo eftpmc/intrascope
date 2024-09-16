@@ -123,8 +123,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Fetch the content of the URL with a timeout of 10 seconds
-    const response = await axios.get(url, { timeout: 10000 });
-    const html = response.data;
+    const response = await fetch(url);
+    const html = await response.text();
 
     // Trim the HTML content to only include meaningful text
     const trimmedContent = trimHTMLContent(html);
