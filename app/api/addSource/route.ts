@@ -8,7 +8,7 @@ import { createClient } from '@/utils/supabase/client';
 const openai = new OpenAI({
   organization: "org-31Ar3v3bAXi7nTb9fxadrYW2",
   project: "proj_JYPxFzMdSOpAa6H4PiYalYqV",
-  timeout: 25000, // Ensure response within the 25-second time limit
+  timeout: 60000, // Ensure response within the 25-second time limit
 });
 
 // Define the structure of a discount object
