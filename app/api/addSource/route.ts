@@ -2,8 +2,8 @@ import axios from 'axios';
 import * as cheerio from 'cheerio';
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
-import { createClient } from '@/utils/supabase/client';
 import { DocumentType } from '@/types/document';
+import { createClient } from '@/utils/supabase/client';
 
 const openai = new OpenAI({
   organization: "org-31Ar3v3bAXi7nTb9fxadrYW2",
