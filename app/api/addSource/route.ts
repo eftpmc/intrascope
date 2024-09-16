@@ -20,7 +20,7 @@ interface Discount {
   updated_at: string;
 }
 
-const chunkContent = (content: string, chunkSize: number = 2000, maxChunks: number = 5): string[] => {
+const chunkContent = (content: string, chunkSize: number = 10000, maxChunks: number = 5): string[] => {
   const chunks = [];
   for (let i = 0; i < content.length && chunks.length < maxChunks; i += chunkSize) {
     chunks.push(content.slice(i, i + chunkSize));
